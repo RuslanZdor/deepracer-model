@@ -5,7 +5,7 @@ import math
 MIN_REWARD = 1e-3
 
 # max speed for racer
-MAX_SPEED = 1
+MAX_SPEED = 3
 
 # max possible reward for aws function
 MAX_REWARD = 1
@@ -15,6 +15,31 @@ ALLOWED_CORRECTION_ANGLE = 15
 
 # angle for not punishing for line correction
 STEERING_THRESHOLD = 20
+
+SPEED_TRACK = {}
+RED = "red"
+ORANGE = "orange"
+GREEN = "green"
+ORANGE_SPEED = 0.70
+RED_SPEED = 0.40
+for i in range(0, 10):
+    SPEED_TRACK[i] = GREEN
+for i in range(20, 45):
+    SPEED_TRACK[i] = ORANGE
+for i in range(53, 70):
+    SPEED_TRACK[i] = ORANGE
+for i in range(70, 85):
+    SPEED_TRACK[i] = GREEN
+for i in range(85, 91):
+    SPEED_TRACK[i] = ORANGE
+for i in range(91, 120):
+    SPEED_TRACK[i] = GREEN
+for i in range(175, 195):
+    SPEED_TRACK[i] = ORANGE
+for i in range(195, 205):
+    SPEED_TRACK[i] = ORANGE
+for i in range(205, 224):
+    SPEED_TRACK[i] = GREEN
 
 
 def reward_function(params):
@@ -29,8 +54,11 @@ def reward_function(params):
                  * angle_with_closest_waypoint_reward(params)
                  * steering_reward(params)
                  * of_track_reward(params))
-    print("result of reward function is " + str(reward))
-
+    print("result_row {} {} {} {} {}".format(speed_reward(params),
+                                             distance_from_center_reward(params),
+                                             angle_with_closest_waypoint_reward(params),
+                                             steering_reward(params),
+                                             of_track_reward(params)))
     progress = params["progress"]
     if progress == 100.0:
         reward += 100
@@ -58,7 +86,13 @@ def steering_reward(params):
 # give more points if racer has faster current speed
 def speed_reward(params):
     current_speed = params['speed']
-    return current_speed / MAX_SPEED
+    s_color = speed_color(params)
+    if s_color == GREEN:
+        return current_speed / MAX_SPEED
+    elif s_color == ORANGE:
+        return 1 - max(0, ORANGE_SPEED - current_speed / MAX_SPEED) - max(0, current_speed / MAX_SPEED - ORANGE_SPEED)
+    elif s_color == RED:
+        return 1 - max(0, RED_SPEED - current_speed / MAX_SPEED) - max(0, current_speed / MAX_SPEED - RED_SPEED)
 
 
 # compare current degree and closest waypoint degree, reward of values is pointing to the same direction
@@ -93,3 +127,11 @@ def closest_waypoint_angle(params):
     if angle <= -180:
         angle += 360
     return angle
+
+
+# get speed color (green is max speed, orange is middle, red for slow parts
+def speed_color(params):
+    closest_waypoints = params['closest_waypoints']
+    if closest_waypoints[1] in SPEED_TRACK:
+        return SPEED_TRACK[closest_waypoints[1]]
+    return RED
