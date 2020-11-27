@@ -11,10 +11,11 @@ MAX_SPEED = 3
 MAX_REWARD = 1
 
 # angle for not punishing for line correction
-ALLOWED_CORRECTION_ANGLE = 15
+ALLOWED_CORRECTION_ANGLE = 10
 
 # angle for not punishing for line correction
 STEERING_THRESHOLD = 20
+GREEN_STEERING_THRESHOLD = 10
 
 SPEED_TRACK = {}
 RED = "red"
@@ -78,7 +79,11 @@ def of_track_reward(params):
 # prevent steering to match to avoid sliding
 def steering_reward(params):
     steering_angle = params['steering_angle']
-    if steering_angle > STEERING_THRESHOLD:
+    s_color = speed_color(params)
+    steering_threshold_angle = STEERING_THRESHOLD
+    if s_color == GREEN:
+        steering_threshold_angle = GREEN_STEERING_THRESHOLD
+    if steering_angle > steering_threshold_angle:
         return 0.5 + (90 - steering_angle) / 180
     return 1
 
@@ -101,7 +106,7 @@ def angle_with_closest_waypoint_reward(params):
     is_left_of_center = params['is_left_of_center']
     difference = heading - closest_waypoint_angle(params)
     if difference > 90:
-        return 0.5
+        return 0
     else:
         if is_left_of_center and -ALLOWED_CORRECTION_ANGLE <= difference < 0:
             return 1

@@ -38,7 +38,7 @@ class TestStringMethods(unittest.TestCase):
 
     def test_left_side_correction(self):
         params = {
-            "heading": -15,
+            "heading": -rf.ALLOWED_CORRECTION_ANGLE,
             "is_left_of_center": True
         }
         with patch('aws_deepracer_reward_function.closest_waypoint_angle') as mock_closest_waypoint_angle:
@@ -48,7 +48,7 @@ class TestStringMethods(unittest.TestCase):
 
     def test_right_side_correction(self):
         params = {
-            "heading": 15,
+            "heading": rf.ALLOWED_CORRECTION_ANGLE,
             "is_left_of_center": False
         }
         with patch('aws_deepracer_reward_function.closest_waypoint_angle') as mock_closest_waypoint_angle:

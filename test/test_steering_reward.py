@@ -8,18 +8,21 @@ class TestStringMethods(unittest.TestCase):
     def test_zero_steering(self):
         params = {
             "steering_angle": 0,
+            "closest_waypoints": [0, 1]
         }
         self.assertEqual(1, rf.steering_reward(params), 'small steering should return max value')
 
-    def test_threshold_steering(self):
+    def test_threshold_steering_green(self):
         params = {
-            "steering_angle": rf.STEERING_THRESHOLD,
+            "steering_angle": rf.GREEN_STEERING_THRESHOLD,
+            "closest_waypoints": [0, 1],
         }
         self.assertEqual(1, rf.steering_reward(params), 'small steering should return max value')
 
-    def test_over_steering_threshold(self):
+    def test_over_steering_threshold_green(self):
         params = {
             "steering_angle": 45,
+            "closest_waypoints": [0, 1],
         }
         self.assertEqual(0.75, rf.steering_reward(params), 'punish over reach steering threshold')
 
