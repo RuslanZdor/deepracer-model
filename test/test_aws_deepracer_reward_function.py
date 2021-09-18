@@ -28,12 +28,18 @@ class TestStringMethods(unittest.TestCase):
 
     def test_negative_scenario(self):
         temp_params = params.copy()
-        temp_params["distance_from_center"] = 11
+        temp_params["distance_from_center"] = 10
+        temp_params["all_wheels_on_track"] = False
         self.assertEqual(rf.MIN_REWARD, rf.reward_function(temp_params))
 
     def test_max_reward(self):
         temp_params = params.copy()
         self.assertEqual(1, rf.reward_function(temp_params))
+
+    def test_finish_lap_reward(self):
+        temp_params = params.copy()
+        temp_params["progress"] = 100
+        self.assertEqual(101, rf.reward_function(temp_params))
 
 
 if __name__ == '__main__':

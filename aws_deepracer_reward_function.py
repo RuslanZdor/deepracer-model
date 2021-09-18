@@ -23,45 +23,26 @@ ORANGE = "orange"
 GREEN = "green"
 ORANGE_SPEED = 0.70
 RED_SPEED = 0.40
-for i in range(0, 10):
-    SPEED_TRACK[i] = GREEN
-for i in range(20, 45):
-    SPEED_TRACK[i] = ORANGE
-for i in range(53, 70):
-    SPEED_TRACK[i] = ORANGE
-for i in range(70, 85):
-    SPEED_TRACK[i] = GREEN
-for i in range(85, 91):
-    SPEED_TRACK[i] = ORANGE
-for i in range(91, 120):
-    SPEED_TRACK[i] = GREEN
-for i in range(175, 195):
-    SPEED_TRACK[i] = ORANGE
-for i in range(195, 205):
-    SPEED_TRACK[i] = ORANGE
-for i in range(205, 224):
+for i in range(0, 1000):
     SPEED_TRACK[i] = GREEN
 
 
 def reward_function(params):
-    """
-    Example of rewarding the agent to follow center line
-    """
-
     # Give higher reward if the car is closer to center line and vice versa and moving faster
     reward = max(MIN_REWARD, MAX_REWARD
                  * speed_reward(params)
                  * distance_from_center_reward(params)
                  * angle_with_closest_waypoint_reward(params)
                  * steering_reward(params)
-                 * of_track_reward(params))
+                 * of_track_reward(params)
+                 * only_left_turn(params))
     print("result_row {} {} {} {} {}".format(speed_reward(params),
                                              distance_from_center_reward(params),
                                              angle_with_closest_waypoint_reward(params),
                                              steering_reward(params),
                                              of_track_reward(params)))
     progress = params["progress"]
-    if progress == 100.0:
+    if progress >= 100.0:
         reward += 100
 
     return float(reward)
@@ -93,7 +74,8 @@ def speed_reward(params):
     current_speed = params['speed']
     s_color = speed_color(params)
     if s_color == GREEN:
-        return current_speed / MAX_SPEED
+        # square function is because to punish more for low speed
+        return (current_speed / MAX_SPEED) * (current_speed / MAX_SPEED)
     elif s_color == ORANGE:
         return 1 - max(0, ORANGE_SPEED - current_speed / MAX_SPEED) - max(0, current_speed / MAX_SPEED - ORANGE_SPEED)
     elif s_color == RED:
@@ -119,7 +101,7 @@ def angle_with_closest_waypoint_reward(params):
 def distance_from_center_reward(params):
     track_width = params['track_width']
     distance_from_center = params['distance_from_center']
-    return (track_width - distance_from_center) / track_width
+    return min(1, (track_width - distance_from_center) / track_width + 0.2)
 
 
 # use "closest_waypoint" params to find current angle for road
@@ -140,3 +122,11 @@ def speed_color(params):
     if closest_waypoints[1] in SPEED_TRACK:
         return SPEED_TRACK[closest_waypoints[1]]
     return RED
+
+
+# return 0 reward for any turn to right, this make sense for places where we what to do only left turn
+def only_left_turn(params):
+    steering_angle = params['steering_angle']
+    if steering_angle < 0:
+        return 0
+    return 1
