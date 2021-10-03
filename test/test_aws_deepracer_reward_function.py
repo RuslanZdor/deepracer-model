@@ -4,7 +4,7 @@ import aws_deepracer_reward_function as rf
 
 params = {
     "track_width": 10,
-    "distance_from_center": 0,
+    "distance_from_center": 0.2,
     "speed": rf.MAX_SPEED,
     "heading": 0,
     "closest_waypoints": [0, 1],
@@ -12,8 +12,13 @@ params = {
     "steering_angle": 0,
     "all_wheels_on_track": True,
     "is_left_of_center": True,
-    "progress": 0
+    "progress": 0,
+    "x": 0.5,
+    "y": 2,
 }
+
+rf.BEST_PATH = {0: [1, 1], 1: [2, 2]}
+rf.SPEED_TRACK = {0: "green", 1: "green"}
 
 
 class TestStringMethods(unittest.TestCase):
@@ -39,7 +44,7 @@ class TestStringMethods(unittest.TestCase):
     def test_finish_lap_reward(self):
         temp_params = params.copy()
         temp_params["progress"] = 100
-        self.assertEqual(101, rf.reward_function(temp_params))
+        self.assertTrue(rf.reward_function(temp_params) > 100)
 
 
 if __name__ == '__main__':
