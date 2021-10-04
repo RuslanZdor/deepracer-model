@@ -24,7 +24,7 @@ class TestStringMethods(unittest.TestCase):
             "steering_angle": 45,
             "closest_waypoints": [0, 1],
         }
-        self.assertEqual(0.75, rf.steering_reward(params), 'punish over reach steering threshold')
+        self.assertEqual(0.8, rf.steering_reward(params), 'punish over reach steering threshold')
 
 
 if __name__ == '__main__':

@@ -38,10 +38,12 @@ def reward_function(params):
                  * speed_reward(params)
                  * distance_from_best_path_reward(params)
                  * steering_reward(params)
-                 * of_track_reward(params))
+                 * of_track_reward(params)
+                 * heading_reward(params)
+                 )
 
     steps = params['steps']
-    progress = params["progress"]
+    progress = params["progress"] + 1
     if progress >= 100:
         reward += 100
 
@@ -154,3 +156,17 @@ def get_color(params, track):
     if closest_waypoints[1] in track:
         return track[closest_waypoints[1]]
     return GREEN
+
+
+def heading_reward(params):
+    next_point = params['waypoints'][params['closest_waypoints'][1]]
+    prev_point = params['waypoints'][params['closest_waypoints'][0]]
+
+    track_direction = math.atan2(next_point[1] - prev_point[1], next_point[0] - prev_point[0])
+    track_direction = math.degrees(track_direction)
+
+    direction_diff = abs(track_direction - params['heading'])
+    if direction_diff > 180:
+        direction_diff = 360 - direction_diff
+
+    return 1 - (direction_diff / 180.0)

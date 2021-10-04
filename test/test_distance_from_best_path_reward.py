@@ -31,7 +31,7 @@ class TestDistanceFromBestPathReward(unittest.TestCase):
             "x": 0,
             "y": 0,
         }
-        self.assertAlmostEqual(0.0, rf.distance_from_best_path_reward(params), msg='of car is out of track return less rewards', delta=0.1)
+        self.assertAlmostEqual(0.3, rf.distance_from_best_path_reward(params), msg='of car is out of track return less rewards', delta=0.1)
 
 
 if __name__ == '__main__':

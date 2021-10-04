@@ -13,6 +13,7 @@ params = {
     "all_wheels_on_track": True,
     "is_left_of_center": True,
     "progress": 0,
+    "steps": 1,
     "x": 0.5,
     "y": 2,
 }
